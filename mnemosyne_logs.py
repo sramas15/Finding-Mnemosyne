@@ -11,6 +11,22 @@ acq_reps_since_lapse NOT NULL AND
 ret_reps_since_lapse NOT NULL AND
 actual_interval NOT NULL""";
 
+USER_ID = 0
+EVENT = 1
+TIMESTAMP = 2
+OBJECT_ID = 3
+GRADE = 4
+EASINESS = 5
+ACQ_REPS = 6
+RET_REPS = 7
+LAPSES = 8
+ACQ_REPS_SINCE_LAPSE = 9
+RET_REPS_SINCE_LAPSE = 10
+SCHEDULED_INTERVAL = 11
+ACTUAL_INTERVAL = 12
+THINKING_TIME = 13
+NEXT_REP = 14
+
 def list_user_ids(limit=100):
     c = conn.cursor()
     c.execute('SELECT DISTINCT user_id FROM log WHERE %s LIMIT %s' % (CLEAN_ROW_CONDITIONS, limit))
