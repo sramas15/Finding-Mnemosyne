@@ -7,7 +7,7 @@ x_train = x[:-200]
 y_train = y[:-200]
 x_test = x[-200:]
 y_test = y[-200:]
-clf = SVR(C=3.0)
+clf = SVR(kernel='linear')
 clf.fit(x_train, y_train) 
 
 #print('Coefficients: \n', clf.coef_)
