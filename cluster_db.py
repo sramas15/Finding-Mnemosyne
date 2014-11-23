@@ -18,3 +18,15 @@ def create_userdb():
             continue
         c.execute("INSERT INTO users values (?,?,?)", new_row)
     new_conn.commit()
+
+def create_userdb2():
+    c = new_conn.cursor()
+    c.execute("DROP TABLE users2")
+    c.execute('''CREATE TABLE users2
+        (user_id text, grade real, temp real)''')
+    c.execute('SELECT user_id, SUM(grade) from log GROUP BY user_id')
+    r = c.fetchall()
+    for row in r:
+        new_row = [row[0], float(row[1])/500, 0.0]
+        c.execute("INSERT INTO users2 values (?,?,?)", new_row)
+    new_conn.commit()
