@@ -11,12 +11,15 @@ ACQ_REPS_SINCE_LAPSE = 9 #(was 5)
 ACTUAL_INTERVAL = 5
 RET_REPS_SINCE_LAPSE = 6
 THINKING_TIME_PREV = 7
+CURR_GRADE_SQ = 10
+PREV_GRADE_SQ = 11
+RET_REPS_SQ = 12
 
 
 def get_training_data(limit=1000):
     users = mnemosyne_logs.list_user_ids(limit)
     num_examples = 0
-    training_x = np.ones((limit, 10), dtype=float)
+    training_x = np.ones((limit, 13), dtype=float)
     training_y = np.ones(limit, dtype=float)
     for user in users:
         logs = mnemosyne_logs.fetch_logs(user)
@@ -33,9 +36,12 @@ def get_training_data(limit=1000):
                 training_x[num_examples][LAPSES] = prev[mnemosyne_logs.LAPSES]
                 training_x[num_examples][ACTUAL_INTERVAL] = prev[mnemosyne_logs.ACTUAL_INTERVAL]
                 training_x[num_examples][RET_REPS_SINCE_LAPSE] = prev[mnemosyne_logs.RET_REPS_SINCE_LAPSE]
-                training_x[num_examples][THINKING_TIME_PREV] = prev[mnemosyne_logs.THINKING_TIME]
-                training_x[num_examples][ACQ_REPS] = prev[mnemosyne_logs.ACQ_REPS]
-                training_x[num_examples][ACQ_REPS_SINCE_LAPSE] = prev[mnemosyne_logs.ACQ_REPS_SINCE_LAPSE]
+                #training_x[num_examples][THINKING_TIME_PREV] = prev[mnemosyne_logs.THINKING_TIME]
+                #training_x[num_examples][ACQ_REPS] = prev[mnemosyne_logs.ACQ_REPS]
+                #training_x[num_examples][ACQ_REPS_SINCE_LAPSE] = prev[mnemosyne_logs.ACQ_REPS_SINCE_LAPSE]
+                training_x[num_examples][CURR_GRADE_SQ] = pow(curr[mnemosyne_logs.GRADE], 2)
+                training_x[num_examples][PREV_GRADE_SQ] = pow(prev[mnemosyne_logs.GRADE], 2)
+                training_x[num_examples][RET_REPS_SQ] = pow(prev[mnemosyne_logs.RET_REPS], 2)
                 training_y[num_examples] = curr[mnemosyne_logs.TIMESTAMP] - prev[mnemosyne_logs.TIMESTAMP]
                 num_examples += 1
                 if num_examples == limit:
