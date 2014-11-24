@@ -6,9 +6,9 @@ import matplotlib.pyplot as plt
 new_conn = sqlite3.connect('data/filtered_logs.db')
 new_conn.row_factory = sqlite3.Row
 
-def run_kmeans(num_means=8):
+def run_kmeans(num_means=5):
 	c = new_conn.cursor()
-	c.execute("SELECT retention, lapses from users")
+	c.execute("SELECT users.acquisition, users2.grade from users INNER JOIN users2 ON users.user_id=users2.user_id")
 	arr = np.array(c.fetchall())
 	estimator = KMeans(n_clusters=num_means)
 	estimator.fit(arr)
@@ -18,11 +18,14 @@ def run_kmeans(num_means=8):
 	print estimator.labels_
 	print estimator.inertia_
 	plt.plot(arr[:, 0], arr[:, 1], 'k.', markersize=2)
+	centroids = estimator.cluster_centers_
+	plt.scatter(centroids[:, 0], centroids[:, 1],
+            marker='x', s=169, linewidths=3, zorder=10)
 	plt.show()
 
 	print "======================================="
-	print "2. kmeans retention rate"
-	c.execute("SELECT retention, lapses-lapses from users")
+	print "2. kmeans acquisition rate"
+	c.execute("SELECT acquisition, lapses-lapses from users")
 	arr = np.array(c.fetchall())
 	estimator.fit(arr)
 	print estimator.cluster_centers_
@@ -40,6 +43,17 @@ def run_kmeans(num_means=8):
 	print estimator.labels_
 	print estimator.inertia_
 	plt.hist(arr[:,1], bins=30)
+	plt.show()
+
+	print "======================================="
+	print "2. kmeans retention rate"
+	c.execute("SELECT retention, lapses-lapses from users")
+	arr = np.array(c.fetchall())
+	estimator.fit(arr)
+	print estimator.cluster_centers_
+	print estimator.labels_
+	print estimator.inertia_
+	plt.hist(arr[:,0], bins=30)
 	plt.show()
 
 def run_kmeans2(num_means=8):
