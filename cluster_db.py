@@ -8,13 +8,15 @@ def create_userdb():
     c.execute("DROP TABLE users")
     c.execute('''CREATE TABLE users
     	(user_id text, retention real, lapses real)''')
-    c.execute('SELECT user_id, SUM(ret), SUM(lapse), SUM(ct) from (select user_id, (MAX(ret_reps)-MIN(ret_reps)) as ret, (MAX(lapses)-MIN(lapses)) as lapse, COUNT(*) as ct from log GROUP BY user_id, object_id) WHERE ct > 1 GROUP BY user_id')
+    c.execute('SELECT user_id, SUM(ret), SUM(lapse), SUM(acq) from (select user_id, MAX(ret_reps) as ret, MAX(lapses) as lapse, MAX(acq_reps) as acq from log GROUP BY user_id, object_id) WHERE user_id in (select user_id from (select user_id, count(distinct object_id) as cnt from log group by user_id)) GROUP BY user_id')
     r = c.fetchall()
     for row in r:
-        new_row = [row[0], float(row[1])/float(row[3]), float(row[2])/float(row[3])]
-        if (row[1] > 500):
+        new_row = [row[0], float(row[1])/float(row[1]+row[2]+row[3]), float(row[2])/float(row[1]+row[2]+row[3])]
+        if (new_row[1] > 1):
+            print ":("
             continue
-        if (row[2] > 500):
+        if (new_row[2] > 1):
+            print ":(("
             continue
         c.execute("INSERT INTO users values (?,?,?)", new_row)
     new_conn.commit()

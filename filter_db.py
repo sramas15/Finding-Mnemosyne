@@ -34,8 +34,6 @@ def create_newdb(limit=850):
         if len(r) < 500:
             continue
         new_c.executemany("INSERT INTO log values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", r)
-        #for row in r:
-        #	new_c.execute("INSERT INTO log values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", row)
         num_users += 1
         if num_users == 500:
         	break

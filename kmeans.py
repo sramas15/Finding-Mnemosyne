@@ -49,7 +49,7 @@ def run_kmeans2(num_means=8):
 	estimator = KMeans(n_clusters=num_means)
 	estimator.fit(arr)
 	print "======================================="
-	print "1. kmeans together"
+	print "1. kmeans average grade"
 	print estimator.cluster_centers_
 	print estimator.labels_
 	print estimator.inertia_
