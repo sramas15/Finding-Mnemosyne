@@ -8,7 +8,7 @@ def create_userdb():
     c.execute("DROP TABLE users")
     c.execute('''CREATE TABLE users
     	(user_id text, retention real, lapses real, acquisition real)''')
-    c.execute('SELECT user_id, SUM(ret), SUM(lapse), SUM(acq) from (select user_id, MAX(ret_reps) as ret, MAX(lapses) as lapse, MAX(acq_reps) as acq from log GROUP BY user_id, object_id) WHERE user_id in (select user_id from (select user_id, count(distinct object_id) as cnt from log group by user_id) where cnt > 200 AND cnt < 300) GROUP BY user_id')
+    c.execute('SELECT user_id, SUM(ret), SUM(lapse), SUM(acq) from (select user_id, MAX(ret_reps) as ret, MAX(lapses) as lapse, MAX(acq_reps) as acq from log GROUP BY user_id, object_id) WHERE user_id in (select user_id from (select user_id, count(distinct object_id) as cnt from log group by user_id) where cnt < 250) GROUP BY user_id')
     r = c.fetchall()
     for row in r:
         new_row = [row[0], float(row[1])/float(row[1]+row[2]+row[3]), float(row[2])/float(row[1]+row[2]+row[3]), float(row[3])/float(row[1]+row[2]+row[3])]
