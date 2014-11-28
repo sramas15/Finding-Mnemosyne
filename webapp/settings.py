@@ -33,6 +33,8 @@ TEMPLATE_DIRS = (
     'webapp/templates',
 )
 
+LOGIN_REDIRECT_URL = '/'
+
 # Application definition
 
 INSTALLED_APPS = (
