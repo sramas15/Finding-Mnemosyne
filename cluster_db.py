@@ -5,7 +5,7 @@ new_conn.row_factory = sqlite3.Row
 
 def create_userdb():
     c = new_conn.cursor()
-    c.execute("DROP TABLE users")
+    c.execute("DROP TABLE IF EXISTS users")
     c.execute('''CREATE TABLE users
     	(user_id text, retention real, lapses real, acquisition real)''')
     c.execute('SELECT user_id, SUM(ret), SUM(lapse), SUM(acq) from (select user_id, MAX(ret_reps) as ret, MAX(lapses) as lapse, MAX(acq_reps) as acq from log GROUP BY user_id, object_id) WHERE user_id in (select user_id from (select user_id, count(distinct object_id) as cnt from log group by user_id) where cnt < 250) GROUP BY user_id')
@@ -26,7 +26,7 @@ def create_userdb():
 
 def create_userdb2():
     c = new_conn.cursor()
-    c.execute("DROP TABLE users2")
+    c.execute("DROP TABLE IF EXISTS users2")
     c.execute('''CREATE TABLE users2
         (user_id text, grade real, temp real)''')
     c.execute('SELECT user_id, SUM(grade) from log GROUP BY user_id')
@@ -35,3 +35,7 @@ def create_userdb2():
         new_row = [row[0], float(row[1])/500, 0.0]
         c.execute("INSERT INTO users2 values (?,?,?)", new_row)
     new_conn.commit()
+
+if __name__ == '__main__':
+    create_userdb()
+    create_userdb2()

@@ -36,7 +36,7 @@ def create_newdb(limit=1300):
     users = [row[0] for row in c.fetchall()]
     num_users = 0
     new_c = new_conn.cursor()
-    new_c.execute("DROP TABLE log")
+    new_c.execute("DROP TABLE IF EXISTS log")
     new_c.execute('''CREATE TABLE log
     	(user_id text, event integer, timestamp integer, object_id text,
     		grade integer, easiness real, acq_reps integer, ret_reps integer,
@@ -70,7 +70,7 @@ def create_regressiondb():
 		if (prev_row[USER_ID] == row[USER_ID] and prev_row[OBJECT_ID] == row[OBJECT_ID]):
 			rows.append([row[USER_ID], row[OBJECT_ID], prev_row[GRADE], prev_row[EASINESS], prev_row[RET_REPS], prev_row[RET_REPS_SL], prev_row[LAPSES], row[GRADE], row[TIMESTAMP]-prev_row[TIMESTAMP]])
 		prev_row = row
-	c.execute("DROP TABLE regression_log")
+	c.execute("DROP TABLE IF EXISTS regression_log")
 	c.execute('''CREATE TABLE regression_log
 		(user_id text, object_id test, grade integer, easiness real, ret_reps integer,
 		 ret_reps_since_lapse integer, lapses integer, pred_grade integer,
@@ -79,6 +79,8 @@ def create_regressiondb():
 	new_conn.commit()
 	print len(rows)
 
-
+if __name__ == '__main__':
+    create_userdb()
+    create_userdb2()
 
 
