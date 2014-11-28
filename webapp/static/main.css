@@ -33,11 +33,9 @@ body {
 }
 
 #grade-label {
-    float: left;
-    position: fixed;
     font-weight: bold;
-    vertical-align: middle;
-    line-height: 35px;
+    text-align: center;
+    padding: 5px 0;
 }
 
 #answer-placeholder {

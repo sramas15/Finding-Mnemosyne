@@ -33,6 +33,7 @@ TEMPLATE_DIRS = (
     'webapp/templates',
 )
 
+LOGIN_URL = '/login'
 LOGIN_REDIRECT_URL = '/'
 
 # Application definition

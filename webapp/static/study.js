@@ -16,21 +16,24 @@
         $("#question-content").html(card.question);
         $("#answer-content").html(card.answer);
 
+        // Set up answer toggle
+        $("#answer-content").hide();
+        $("#answer-panel").click(function() {
+            $("#answer-content").show();
+            $("#answer-placeholder").hide();
+            $(this).off();
+        });
 
         // set click listener on grade buttons
-        // rehide answer, then call callback
+        $("#grade-toolbar button").click(function() {
+            callback(parseInt($(this).data("grade")));
+            $("#grade-toolbar button").off();
+        });
     }
 
-    $("#answer-content").hide();
-
-    $("#answer-panel").click(function() {
-        $("#answer-content").show();
-        $("#answer-placeholder").hide();
+    showCard(new Card("Hello", "Bye"), function(grade) {
+        console.log(grade);
     });
-
-    showCard(new Card("Hello", "Bye"));
-
-
 
     // send requests to update database as we go
 
