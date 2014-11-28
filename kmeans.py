@@ -8,6 +8,9 @@ new_conn.row_factory = sqlite3.Row
 
 def run_kmeans(num_means=5):
 	c = new_conn.cursor()
+	c.execute("SELECT user_id from users")
+	arr = c.fetchall()
+	print arr
 	c.execute("SELECT acquisition, lapses from users")
 	arr = np.array(c.fetchall())
 	estimator = KMeans(n_clusters=num_means)
@@ -19,6 +22,8 @@ def run_kmeans(num_means=5):
 	print estimator.inertia_
 	print len(estimator.labels_)
 	plt.plot(arr[:, 0], arr[:, 1], 'k.', markersize=2)
+	plt.xlabel('acquisition rate')
+	plt.ylabel('lapse rate')
 	centroids = estimator.cluster_centers_
 	plt.scatter(centroids[:, 0], centroids[:, 1],
             marker='x', s=169, linewidths=3, zorder=10)
@@ -33,6 +38,8 @@ def run_kmeans(num_means=5):
 	print estimator.labels_
 	print estimator.inertia_
 	plt.hist(arr[:,0], bins=30)
+	plt.xlabel('acquisition rate')
+	plt.ylabel('frequency')
 	plt.show()
 
 	print "======================================="
@@ -44,6 +51,8 @@ def run_kmeans(num_means=5):
 	print estimator.labels_
 	print estimator.inertia_
 	plt.hist(arr[:,1], bins=30)
+	plt.xlabel('lapse rate')
+	plt.ylabel('frequency')
 	plt.show()
 
 	print "======================================="
@@ -55,6 +64,8 @@ def run_kmeans(num_means=5):
 	print estimator.labels_
 	print estimator.inertia_
 	plt.hist(arr[:,0], bins=30)
+	plt.xlabel('retention rate')
+	plt.ylabel('frequency')
 	plt.show()
 
 def run_kmeans2(num_means=8):
