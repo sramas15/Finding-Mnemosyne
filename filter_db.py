@@ -79,8 +79,50 @@ def create_regressiondb():
 	new_conn.commit()
 	print len(rows)
 
+def create_discretizeddb():
+    c = new_conn.cursor()
+    c.execute('SELECT * FROM log ORDER BY user_id, object_id, timestamp')
+    c.execute("DROP TABLE IF EXISTS discrete_log")
+    c.execute('''CREATE TABLE discrete_log
+        (user_id text, object_id test, grade integer, easiness real, ret_reps integer,
+         ret_reps_since_lapse integer, lapses integer, pred_grade integer,
+         interval integer)''')
+    c.execute('SELECT * from regression_log')
+    row = None
+    rows = []
+    while True:
+        row = c.fetchone()
+        if row == None:
+            break
+        interval = getInterval(row[8])
+        rows.append([row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], interval])
+    c.executemany("INSERT INTO discrete_log VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", rows)
+    new_conn.commit()
+
+def getInterval(interval):
+    if interval < 60*60:
+        return 0
+    if interval < 60*60*4:
+        return 1
+    if interval < 60*60*12:
+        return 2
+    if interval < 60*60*24:
+        return 3
+    if interval < 60*60*24*2:
+        return 4
+    if interval < 60*60*24*4:
+        return 5
+    if interval < 60*60*24*8:
+        return 6
+    if interval < 60*60*24*16:
+        return 7
+    if interval < 60*60*24*64:
+        return 8
+    return 9
+
+
 if __name__ == '__main__':
-    create_userdb()
-    create_userdb2()
+    create_newdb()
+    create_regressiondb()
 
 
