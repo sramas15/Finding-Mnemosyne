@@ -2,6 +2,35 @@
 
 {% block content %}
 
+<div class="center-block well" style="max-width: 800px;">
+    <div class="panel text-center card-panel" id="question-panel">
+        <span class="card-content" id="question-content"></span>
+    </div>
+    <div class="panel text-center card-panel" id="answer-panel">
+        <span class="card-content" id="answer-content"></span>
+        <span class="card-content" id="answer-placeholder">Show Answer</span>
+    </div>
+    <div>
+        <div id="grade-label">
+            Grade your response:
+        </div>
+        <div class="btn-toolbar" id="grade-toolbar" role="toolbar">
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-default">0</button>
+                <button type="button" class="btn btn-default">1</button>
+            </div>
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-default">2</button>
+                <button type="button" class="btn btn-default">3</button>
+                <button type="button" class="btn btn-default">4</button>
+                <button type="button" class="btn btn-default">5</button>
+            </div>
+        </div>
+    </div>
+</div>
 
+{% endblock %}
 
+{% block jsIncludes %}
+<script src="/static/study.js"></script>
 {% endblock %}
