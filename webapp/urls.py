@@ -7,8 +7,9 @@ urlpatterns = patterns('',
     # url(r'^blog/', include('blog.urls')),
 
     url(r'^$', 'webapp.views.home', name='home'),
-    url(r'^admin/', include(admin.site.urls)),
     url(r'^study/$', 'webapp.views.study', name='study'),
+    url(r'^upload/$', 'webapp.views.upload_card_set', name='upload_card_set'),
+    url(r'^admin/', include(admin.site.urls)),
     url(r'^login/$', 'django.contrib.auth.views.login'),
     url(r'^logout/$', 'django.contrib.auth.views.logout', {'next_page': '/'}),
 )

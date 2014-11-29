@@ -2,7 +2,9 @@
 
 {% block content %}
 
-<h1>Hi, {{ user.username }}.</h1>
+{% for card_set in card_sets %}
+<p>{{ card_set.name }}</p>
+{% endfor %}
 
 {% endblock %}
 
