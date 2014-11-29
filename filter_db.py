@@ -31,6 +31,9 @@ THINKING_TIME = 13
 NEXT_REP = 14
 
 def create_newdb(limit=1300):
+    """
+    Creates smaller database
+    """
     c = conn.cursor()
     c.execute('SELECT DISTINCT user_id FROM log WHERE %s LIMIT %s' % (CLEAN_ROW_CONDITIONS, limit))
     users = [row[0] for row in c.fetchall()]
@@ -38,11 +41,11 @@ def create_newdb(limit=1300):
     new_c = new_conn.cursor()
     new_c.execute("DROP TABLE IF EXISTS log")
     new_c.execute('''CREATE TABLE log
-    	(user_id text, event integer, timestamp integer, object_id text,
-    		grade integer, easiness real, acq_reps integer, ret_reps integer,
-    		lapses integer, acq_reps_since_lapse integer, ret_reps_since_lapse integer,
-    		scheduled_interval integer, actual_interval integer, thinking_time integer,
-    		next_rep integer)''')
+        (user_id text, event integer, timestamp integer, object_id text,
+            grade integer, easiness real, acq_reps integer, ret_reps integer,
+            lapses integer, acq_reps_since_lapse integer, ret_reps_since_lapse integer,
+            scheduled_interval integer, actual_interval integer, thinking_time integer,
+            next_rep integer)''')
     for u in users:
         c.execute('SELECT * FROM log WHERE user_id = "%s" AND event = 9 ORDER BY timestamp ASC LIMIT 1000'
                 % u)
@@ -52,34 +55,36 @@ def create_newdb(limit=1300):
         new_c.executemany("INSERT INTO log values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", r)
         num_users += 1
         if num_users == 500:
-        	break
+            break
     new_conn.commit()
     print "Num greater than 500 %d" % num_users
     return users
 
 def create_regressiondb():
-	c = new_conn.cursor()
-	c.execute('SELECT * FROM log ORDER BY user_id, object_id, timestamp')
-	row = None
-	prev_row = c.fetchone()
-	rows = []
-	while True:
-		row = c.fetchone()
-		if row == None:
-			break
-		if (prev_row[USER_ID] == row[USER_ID] and prev_row[OBJECT_ID] == row[OBJECT_ID]):
-			rows.append([row[USER_ID], row[OBJECT_ID], prev_row[GRADE], prev_row[EASINESS], prev_row[RET_REPS], prev_row[RET_REPS_SL], prev_row[LAPSES], row[GRADE], row[TIMESTAMP]-prev_row[TIMESTAMP]])
-		prev_row = row
-	c.execute("DROP TABLE IF EXISTS regression_log")
-	c.execute('''CREATE TABLE regression_log
-		(user_id text, object_id test, grade integer, easiness real, ret_reps integer,
-		 ret_reps_since_lapse integer, lapses integer, pred_grade integer,
-		 interval integer)''')
-	c.executemany("INSERT INTO regression_log VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", rows)
-	new_conn.commit()
-	print len(rows)
+    """Combines two rows at a time"""
+    c = new_conn.cursor()
+    c.execute('SELECT * FROM log ORDER BY user_id, object_id, timestamp')
+    row = None
+    prev_row = c.fetchone()
+    rows = []
+    while True:
+        row = c.fetchone()
+        if row == None:
+            break
+        if (prev_row[USER_ID] == row[USER_ID] and prev_row[OBJECT_ID] == row[OBJECT_ID]):
+            rows.append([row[USER_ID], row[OBJECT_ID], prev_row[GRADE], prev_row[EASINESS], prev_row[RET_REPS], prev_row[RET_REPS_SL], prev_row[LAPSES], row[GRADE], row[TIMESTAMP]-prev_row[TIMESTAMP]])
+        prev_row = row
+    c.execute("DROP TABLE IF EXISTS regression_log")
+    c.execute('''CREATE TABLE regression_log
+        (user_id text, object_id test, grade integer, easiness real, ret_reps integer,
+         ret_reps_since_lapse integer, lapses integer, pred_grade integer,
+         interval integer)''')
+    c.executemany("INSERT INTO regression_log VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", rows)
+    new_conn.commit()
+    print len(rows)
 
 def create_discretizeddb():
+    """Goes through regression db and discretizes intervals """
     c = new_conn.cursor()
     c.execute('SELECT * FROM log ORDER BY user_id, object_id, timestamp')
     c.execute("DROP TABLE IF EXISTS discrete_log")

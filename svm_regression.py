@@ -1,5 +1,5 @@
 """
-linear_regression.py
+svm_regression.py
 
 Run an SVR with linear kernel to learn a linear function from
 features on a pair of consecutive repetitions to the

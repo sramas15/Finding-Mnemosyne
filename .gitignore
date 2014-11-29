@@ -2,6 +2,7 @@ data
 .*.swp
 *.swp
 venv/
+*.db
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
