@@ -3,12 +3,14 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, render_to_response
 from django.template.loader import get_template
 from django.template import Context, RequestContext
+from django.forms.models import model_to_dict
 
 from webapp.forms import UploadCardSetForm
 from cards.file_formats import Mnemosyne2Cards
 from cards.models import Card, CardSet
 
 import sys
+import json
 
 @login_required
 def home(request):
@@ -18,7 +20,11 @@ def home(request):
 
 @login_required
 def study(request):
-    return render_to_response('study.html', context_instance=RequestContext(request))
+    cards = CardSet.objects.get(id=1).card_set.all()
+    cards_dict = [model_to_dict(card) for card in cards];
+    return render_to_response('study.html',
+            {'cards_json': json.dumps(cards_dict)},
+            context_instance=RequestContext(request))
 
 @login_required
 def upload_card_set(request):

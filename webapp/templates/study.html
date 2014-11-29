@@ -27,11 +27,17 @@
             </div>
         </div>
     </div>
-    {{ user.is_authent }}
 </div>
 
 {% endblock %}
 
 {% block jsIncludes %}
+{% autoescape off %}
+<script type="text/javascript">
+(function ($) {
+    $.cards = {{ cards_json }};
+})(jQuery);
+</script>
+{% endautoescape %}
 <script src="/static/study.js"></script>
 {% endblock %}
