@@ -2,9 +2,12 @@
 
 {% block content %}
 
+Card sets uploaded:
+<ul>
 {% for card_set in card_sets %}
-<p>{{ card_set.name }}</p>
+<li>{{ card_set.name }}</li>
 {% endfor %}
+</ul>
 
 {% endblock %}
 

@@ -2,6 +2,7 @@ import xml.etree.ElementTree as ET
 import zipfile
 
 class Mnemosyne2Cards(object):
+    @staticmethod
     def read(filename):
         with zipfile.ZipFile(filename, "r") as zip_file:
             # Extract cards XML file

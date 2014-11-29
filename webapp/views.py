@@ -8,6 +8,8 @@ from webapp.forms import UploadCardSetForm
 from cards.file_formats import Mnemosyne2Cards
 from cards.models import Card, CardSet
 
+import sys
+
 @login_required
 def home(request):
     return render_to_response('home.html',
@@ -30,6 +32,7 @@ def upload_card_set(request):
                 # FIXME be more specific about what to catch
                 cards = None
 
+            #print >>sys.stderr, cards
             if cards:
                 # Create new card set
                 card_set = CardSet(name=form.cleaned_data['name'])
