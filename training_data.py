@@ -1,5 +1,12 @@
+"""
+training_data.py
+
+Function(s) to extract pairwise features on consecutive repetitions
+in the Mnemosyne logs.
+"""
 import mnemosyne_logs
 import numpy as np
+from itertools import tee, izip
 
 CURR_GRADE = 0
 PREV_GRADE = 1
@@ -15,6 +22,11 @@ CURR_GRADE_SQ = 10
 PREV_GRADE_SQ = 11
 RET_REPS_SQ = 12
 
+def pairwise(iterable):
+    "s -> (s0,s1), (s1,s2), (s2, s3), ..."
+    a, b = tee(iterable)
+    next(b, None)
+    return izip(a, b)
 
 def get_training_data(limit=1000):
     users = mnemosyne_logs.list_user_ids(limit)
@@ -22,13 +34,8 @@ def get_training_data(limit=1000):
     training_x = np.ones((limit, 13), dtype=float)
     training_y = np.ones(limit, dtype=float)
     for user in users:
-        logs = mnemosyne_logs.fetch_logs(user)
-
-        for card in logs:
-            num_reps = len(card)
-            for i in range(1, num_reps):
-                prev = card[i-1]
-                curr = card[i]
+        for card_logs in mnemosyne_logs.fetch_logs(user):
+            for prev, curr in pairwise(card_logs):
                 training_x[num_examples][CURR_GRADE] = curr[mnemosyne_logs.GRADE]
                 training_x[num_examples][PREV_GRADE] = prev[mnemosyne_logs.GRADE]
                 training_x[num_examples][EASINESS] = prev[mnemosyne_logs.EASINESS]
@@ -43,9 +50,9 @@ def get_training_data(limit=1000):
                 training_x[num_examples][PREV_GRADE_SQ] = pow(prev[mnemosyne_logs.GRADE], 2)
                 training_x[num_examples][RET_REPS_SQ] = pow(prev[mnemosyne_logs.RET_REPS], 2)
                 training_y[num_examples] = curr[mnemosyne_logs.TIMESTAMP] - prev[mnemosyne_logs.TIMESTAMP]
+
+                # Cap the total number of training examples
                 num_examples += 1
                 if num_examples == limit:
                     return (training_x, training_y)
 
-
-        

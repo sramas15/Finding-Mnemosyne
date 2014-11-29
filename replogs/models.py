@@ -3,7 +3,8 @@ from django.db import models
 from cards.models import Card
 
 class RepLog(models.Model):
-    card = models.ForeignKey(Card)
     user = models.ForeignKey(User)
+    card = models.ForeignKey(Card)
+    
     # TODO: add the rest of the fields!
 
