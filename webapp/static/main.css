@@ -1,6 +1,48 @@
 body {
     padding-top: 50px;
 }
+
 .content-block {
     padding: 40px 15px;
+}
+
+.card-panel {
+    display: block;
+    padding: 25px;
+    height: 150px;
+}
+
+.card-content {
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 100px;
+    font-size: xx-large;
+    font-weight: bold;
+}
+
+.card-panel:hover {
+    background-color: #FAFAFA;
+}
+
+#grade-toolbar {
+    text-align: center;
+}
+
+#grade-toolbar > .btn-group {
+    float: none;
+}
+
+#grade-label {
+    font-weight: bold;
+    text-align: center;
+    padding: 5px 0;
+}
+
+#answer-placeholder {
+    opacity: 0.5;
+}
+
+#answer-toggle {
+    display: inline-block;
+    vertical-align: middle;
 }

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="center-block well" style="max-width: 800px;">
+    <div class="panel text-center card-panel" id="question-panel">
+        <span class="card-content" id="question-content"></span>
+    </div>
+    <div class="panel text-center card-panel" id="answer-panel">
+        <span class="card-content" id="answer-content"></span>
+        <span class="card-content" id="answer-placeholder">Show Answer</span>
+    </div>
+    <div>
+        <div id="grade-label">
+            Grade your response:
+        </div>
+        <div class="btn-toolbar" id="grade-toolbar" role="toolbar">
+            <div class="btn-group" role="group">
+                <button type="button" data-grade="0" class="btn btn-danger btn-lg">0</button>
+                <button type="button" data-grade="1" class="btn btn-default btn-lg">1</button>
+            </div>
+            <div class="btn-group" role="group">
+                <button type="button" data-grade="2" class="btn btn-default btn-lg">2</button>
+                <button type="button" data-grade="3" class="btn btn-default btn-lg">3</button>
+                <button type="button" data-grade="4" class="btn btn-default btn-lg">4</button>
+                <button type="button" data-grade="5" class="btn btn-success btn-lg">5</button>
+            </div>
+        </div>
+    </div>
+    {{ user.is_authent }}
+</div>
+
+{% endblock %}
+
+{% block jsIncludes %}
+<script src="/static/study.js"></script>
+{% endblock %}
