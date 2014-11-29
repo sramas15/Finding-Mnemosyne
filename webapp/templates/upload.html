@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="row">
+    <div class="center-block well" style="max-width: 350px;">
+
+        <form action="{% url 'webapp.views.upload_card_set' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>
+            {% endif %}
+            <p>{{ form.name.label_tag }} {{ form.name.help_text }}</p>
+            <p>
+                {{ form.name.errors }}
+                {{ form.name }}
+            </p>
+            <p>{{ form.file.label_tag }} {{ form.file.help_text }}</p>
+            <p>
+                {{ form.file.errors }}
+                {{ form.file }}
+            </p>
+            <p><input type="submit" class="btn btn-primary btn-block" value="Upload" /></p>
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}
+
