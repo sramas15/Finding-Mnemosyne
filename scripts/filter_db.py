@@ -32,7 +32,11 @@ NEXT_REP = 14
 
 def create_newdb(limit=1300):
     """
-    Creates smaller database
+    Samples from full logs to create a smaller "filtered" database.
+
+    Only samples repetition logs (event type 9),
+    caps the number of users sampled at 500,
+    and skips users with less than 1000 repetition log entries.
     """
     c = conn.cursor()
     c.execute('SELECT DISTINCT user_id FROM log WHERE %s LIMIT %s' % (CLEAN_ROW_CONDITIONS, limit))
@@ -52,7 +56,7 @@ def create_newdb(limit=1300):
         r = c.fetchall()
         if len(r) < 1000:
             continue
-        new_c.executemany("INSERT INTO log values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", r)
+        new_c.executemany("INSERT INTO log VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", r)
         num_users += 1
         if num_users == 500:
             break
@@ -61,7 +65,11 @@ def create_newdb(limit=1300):
     return users
 
 def create_regressiondb():
-    """Combines two rows at a time"""
+    """
+    Reads from the filtered database and produces a set of pairwise features on
+    each consecutive pair of repetition logs for each sequence of logs per card
+    per user, filling a new regression_log table.
+    """
     c = new_conn.cursor()
     c.execute('SELECT * FROM log ORDER BY user_id, object_id, timestamp')
     row = None
@@ -72,7 +80,15 @@ def create_regressiondb():
         if row == None:
             break
         if (prev_row[USER_ID] == row[USER_ID] and prev_row[OBJECT_ID] == row[OBJECT_ID]):
-            rows.append([row[USER_ID], row[OBJECT_ID], prev_row[GRADE], prev_row[EASINESS], prev_row[RET_REPS], prev_row[RET_REPS_SL], prev_row[LAPSES], row[GRADE], row[TIMESTAMP]-prev_row[TIMESTAMP]])
+            rows.append([row[USER_ID],
+                row[OBJECT_ID],
+                prev_row[GRADE],
+                prev_row[EASINESS],
+                prev_row[RET_REPS],
+                prev_row[RET_REPS_SL],
+                prev_row[LAPSES],
+                row[GRADE],
+                row[TIMESTAMP]-prev_row[TIMESTAMP]])
         prev_row = row
     c.execute("DROP TABLE IF EXISTS regression_log")
     c.execute('''CREATE TABLE regression_log
@@ -84,7 +100,10 @@ def create_regressiondb():
     print len(rows)
 
 def create_discretizeddb():
-    """Goes through regression db and discretizes intervals """
+    """
+    Discretizes the intervals in regression_log, producing a new version of the logs
+    in discrete_log.
+    """
     c = new_conn.cursor()
     c.execute('SELECT * FROM log ORDER BY user_id, object_id, timestamp')
     c.execute("DROP TABLE IF EXISTS discrete_log")
@@ -99,35 +118,27 @@ def create_discretizeddb():
         row = c.fetchone()
         if row == None:
             break
-        interval = getInterval(row[8])
+        interval = get_interval(row[8])
         rows.append([row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], interval])
     c.executemany("INSERT INTO discrete_log VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", rows)
     new_conn.commit()
 
-def getInterval(interval):
-    if interval < 60*60:
-        return 0
-    if interval < 60*60*4:
-        return 1
-    if interval < 60*60*12:
-        return 2
-    if interval < 60*60*24:
-        return 3
-    if interval < 60*60*24*2:
-        return 4
-    if interval < 60*60*24*4:
-        return 5
-    if interval < 60*60*24*8:
-        return 6
-    if interval < 60*60*24*16:
-        return 7
-    if interval < 60*60*24*64:
-        return 8
-    return 9
-
+import bisect
+INTERVAL_BUCKETS = [
+        60*60,
+        60*60*4,
+        60*60*12,
+        60*60*24,
+        60*60*24*2,
+        60*60*24*4,
+        60*60*24*8,
+        60*60*24*16,
+        60*60*24*64
+    ]
+def get_interval(interval):
+    return bisect.bisect_right(INTERVAL_BUCKETS, interval)
 
 if __name__ == '__main__':
     create_newdb()
     create_regressiondb()
-
 
