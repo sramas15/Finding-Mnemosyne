@@ -11,16 +11,18 @@ def create_userdb():
     c.execute('SELECT user_id, SUM(ret), SUM(lapse), SUM(acq) from (select user_id, MAX(ret_reps) as ret, MAX(lapses) as lapse, MAX(acq_reps) as acq from log GROUP BY user_id, object_id) WHERE user_id in (select user_id from (select user_id, count(distinct object_id) as cnt from log group by user_id) where cnt < 250) GROUP BY user_id')
     r = c.fetchall()
     for row in r:
+        c.execute('SELECT COUNT(distinct object_id) from log where user_id="%s"' % row[0])
+        #dist_cards = c.fetchone()[0]
         new_row = [row[0], float(row[1])/float(row[1]+row[2]+row[3]), float(row[2])/float(row[1]+row[2]+row[3]), float(row[3])/float(row[1]+row[2]+row[3])]
-        if (new_row[1] > 1):
-            print ":("
-            continue
-        if (new_row[2] > 1):
-            print ":(("
-            continue
-        if (new_row[3] > 1):
-            print ":((("
-            continue
+        #if (new_row[1] > 1):
+        #    print ":("
+        #    continue
+        #if (new_row[2] > 1):
+        #    print ":(("
+        #    continue
+        #if (new_row[3] > 1):
+        #    print ":((("
+        #    continue
         c.execute("INSERT INTO users values (?,?,?,?)", new_row)
     new_conn.commit()
 
