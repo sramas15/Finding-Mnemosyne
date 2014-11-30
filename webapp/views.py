@@ -8,6 +8,7 @@ from django.forms.models import model_to_dict
 from webapp.forms import UploadCardSetForm
 from cards.file_formats import Mnemosyne2Cards
 from cards.models import Card, CardSet, AssignedCard
+from scheduling.models import RepIntervalLog
 
 import sys
 import json
@@ -61,4 +62,32 @@ def upload_card_set(request):
     return render_to_response('upload.html',
             {'form': form},
             context_instance=RequestContext(request))
+
+
+@login_required
+def upload_user_logs(request):
+    if request.method == 'POST':
+        form = UploadCardSetForm(request.POST, request.FILES)
+        if form.is_valid():
+            # Read cards file
+
+
+            #print >>sys.stderr, cards
+            if cards:
+                # Create new card set
+                card_set = CardSet(name=form.cleaned_data['name'])
+                card_set.save()
+
+                # Create cards
+                for question, answer in cards:
+                    card = Card(card_set=card_set, question=question, answer=answer)
+                    card.save()
+
+        # TODO: provide feedback for invalid uploads
+    else:
+        form = UploadCardSetForm()
+    return render_to_response('upload.html',
+            {'form': form},
+            context_instance=RequestContext(request))
+
 

@@ -6,21 +6,6 @@ from models import RegressionWeights, RepIntervalLog
 from datetime import timedelta
 import bisect
 
-INTERVAL_BUCKETS = [
-        60*60,
-        60*60*4,
-        60*60*12,
-        60*60*24,
-        60*60*24*2,
-        60*60*24*4,
-        60*60*24*8,
-        60*60*24*16,
-        60*60*24*64
-    ]
-
-def get_interval(interval):
-    return bisect.bisect_right(INTERVAL_BUCKETS, interval)
-
 def log_rep(assigned_card, new_grade, now):
     "Log a repetition. Make sure to call this before updating the assigned card."
 
