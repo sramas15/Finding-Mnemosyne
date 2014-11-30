@@ -21,5 +21,5 @@ class RegressionWeights(models.Model):
     ret_reps = models.FloatField()
     ret_reps_since_lapse = models.FloatField()
     lapses = models.FloatField()
-    interval = models.FloatField()
+    intercept = models.FloatField()
 

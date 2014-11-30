@@ -3,6 +3,8 @@
 {% block content %}
 
 <div class="center-block well" style="max-width: 800px;">
+    <div class="alert alert-success" id="no-cards-alert" role="alert">You're done for today! <button type="button" id="add-cards-btn" class="btn btn-link">Add 20 new cards from my deck.</button></div>
+    <div class="alert alert-warning" id="a-lot-alert" role="alert">You've already studied <span id="a-lot-threshold"></span> cards today! Maybe it's time to take a break? <button type="button" id="keep-going-btn" class="btn btn-link">Nah, keep them coming!</button></div>
     <div class="panel text-center card-panel" id="question-panel">
         <span class="card-content" id="question-content"></span>
     </div>

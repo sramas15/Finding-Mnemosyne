@@ -12,10 +12,11 @@ class Card(models.Model):
 class AssignedCard(models.Model):
     card = models.ForeignKey(Card)
     user = models.ForeignKey(User)
-    last_shown = models.DateField(auto_now=True)
+    last_shown = models.DateTimeField(null=True)
     last_grade = models.SmallIntegerField(default=0)
     easiness = models.FloatField(default=2.5)
     ret_reps = models.IntegerField(default=0)
     ret_reps_since_lapse = models.IntegerField(default=0)
     lapses = models.IntegerField(default=0)
-    scheduled_interval = models.IntegerField(default=0)
+    scheduled_rep = models.DateTimeField(null=True)
+

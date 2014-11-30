@@ -30,11 +30,7 @@ def home(request):
 
 @login_required
 def study(request):
-    cards = CardSet.objects.get(id=1).card_set.all()
-    cards_dict = [model_to_dict(card) for card in cards];
-    return render_to_response('study.html',
-            {'cards_json': json.dumps(cards_dict)},
-            context_instance=RequestContext(request))
+    return render_to_response('study.html', context_instance=RequestContext(request))
 
 @login_required
 def upload_card_set(request):
