@@ -32,7 +32,7 @@ I'm not sure what the details are on this, but mainly you'll just need to have a
 running locally on your machine, and also to have the command line util "psql" to play around in case
 you want to see the tables.
 
-After install postgres, create the tables:
+After installing postgres, create the tables:
 
     python manage.py migrate
 
@@ -44,9 +44,13 @@ Now the app should work.
 
     foreman start
 
-In the future, to push changes to the heroku repo, just run
+In the future, to push changes to the heroku repo, just run:
 
     git push heroku master
+
+To push to our main Github repo, do what we've always done:
+
+    git push
 
 Upload cards
 ============
@@ -79,7 +83,7 @@ See the source code to see what it's actually doing.
 
 Upload user logs
 ================
-Currently, you can upload the discrete_logs entries as a CSV file to the app, where it will load those
+Currently, you can upload the discrete_log entries as a CSV file to the app, where it will load those
 log entries into the database as your user's own logs (I haven't done any fancy stuff with creating a
 special/separate user to associate these "prior" entries with yet).
 
