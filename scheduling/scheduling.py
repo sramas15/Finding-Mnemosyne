@@ -1,7 +1,7 @@
 from django.utils import timezone
 
 from cards.models import Card, CardSet, AssignedCard
-from models import RegressionWeights, RepIntervalLog, get_interval
+from models import RegressionWeights, RepIntervalLog, get_interval, get_interval_bucket
 
 from datetime import timedelta
 
@@ -12,6 +12,8 @@ def log_rep(assigned_card, new_grade, now):
     if assigned_card.last_shown is None:
         return
 
+    interval = (now - assigned_card.last_shown).total_seconds()
+
     log = RepIntervalLog(
             user=assigned_card.user,
             card=assigned_card.card,
@@ -21,7 +23,8 @@ def log_rep(assigned_card, new_grade, now):
             ret_reps=assigned_card.ret_reps,
             ret_reps_since_lapse=assigned_card.ret_reps_since_lapse,
             lapses=assigned_card.lapses,
-            interval=(now - assigned_card.last_shown).total_seconds())
+            interval=interval,
+            interval=get_interval_bucket(interval))
 
 def add_unseen_cards(user, limit=20):
     "Schedule (at most 'limit') unseen cards to be studied now"
