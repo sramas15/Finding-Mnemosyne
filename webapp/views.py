@@ -61,3 +61,4 @@ def upload_card_set(request):
     return render_to_response('upload.html',
             {'form': form},
             context_instance=RequestContext(request))
+

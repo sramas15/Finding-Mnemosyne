@@ -16,36 +16,40 @@
         });
 
         // set click listener on grade buttons
-        $("#grade-toolbar button").off('click.grade');
         $("#grade-toolbar button").on('click.grade', function() {
+            $("#grade-toolbar button").off('click.grade');
             callback(card, parseInt($(this).data("grade")));
         });
     }
 
-    var aLotOfCardsThreshold = 50;
 
-    function nextCard(cards, i) {
+    /* Wrapper function */
+    function study(cards) {
+        nextCard(cards, 0, 50);
+    }
+
+    /* Start studying the ith card in cards, stopping at threshold */
+    function nextCard(cards, i, threshold) {
         if (i >= cards.length) {
             $("#no-cards-alert").show();
             return;
         }
 
-        if (i > aLotOfCardsThreshold) {
-            $("#a-lot-threshold").html(aLotOfCardsThreshold);
+        if (i > threshold) {
+            $("#a-lot-threshold").html(threshold);
             $("#a-lot-alert").show();
             $("#keep-going-btn").off("click.keepGoing").on("click.keepGoing", function () {
                 $("#a-lot-alert").hide();
-                aLotOfCardsThreshold += 30;
-                nextCard(cards, i);
+                nextCard(cards, i, threshold + 30);
             });
             return;
         }
 
         showCard(cards[i], function (card, grade) {
-            // send requests to update database as we go
+            // send log updates to database as we go
             $.get("/json/new_log/" + card.id + "/" + grade);
             // FIXME proper error checking?
-            nextCard(cards, i + 1);
+            nextCard(cards, i + 1, threshold);
         });
     }
 
@@ -55,11 +59,11 @@
     $("#add-cards-btn").click(function() {
         $("#no-cards-alert").hide();
         $.getJSON("/json/get_study_queue/new", function(cards) {
-            nextCard(cards, 0);
+            study(cards);
         });
     });
     $.getJSON("/json/get_study_queue", function(cards) {
-        nextCard(cards, 0);
+        study(cards);
     });
 
 })(jQuery);

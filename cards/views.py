@@ -2,13 +2,13 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.forms.models import model_to_dict
+from django.utils import timezone
 
 from cards.models import Card, CardSet, AssignedCard
-from scheduling.scheduling import log_rep, get_scheduled_cards, add_unseen_cards
+from scheduling.scheduling import log_rep, get_scheduled_cards, add_unseen_cards, update_card
 from scheduling.models import RepIntervalLog
 
-import json
-
+import json, datetime
 
 def is_int(s):
     try:
@@ -39,8 +39,9 @@ def new_log(request, card_id, grade):
     card = Card.objects.get(id=card_id)
     assigned_card = AssignedCard.objects.get(user=request.user, card=card)
 
-    log_rep(user, card, assigned_card, grade)
-    update_card(user, card, grade)
+    now = timezone.now()
+    log_rep(assigned_card, grade, now)
+    update_card(assigned_card, grade, now)
 
     return JsonResponse({"success": True})
 
