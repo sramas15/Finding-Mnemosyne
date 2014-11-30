@@ -115,14 +115,15 @@ def run_conditioning_disc(grouping, num_runs):
             c.execute('SELECT grade, easiness, ret_reps, ret_reps_since_lapse, lapses, pred_grade from discrete_log where user_id="%s"' % u2)
             x_test = np.array(c.fetchall())
             #print len(x_test)
-            c.execute('SELECT interval from discrete_log where user_id="%s"' % u1)
+            c.execute('SELECT interval_bucket from discrete_log where user_id="%s"' % u1)
             y_train = np.array(c.fetchall())
             #print np.shape(y_train)
             y_train = y_train[:,0]
-            c.execute('SELECT interval from discrete_log where user_id="%s"' % u2)
+            c.execute('SELECT interval_bucket from discrete_log where user_id="%s"' % u2)
             y_test = np.array(c.fetchall())[:,0]
             clf = SVC()
-            clf.fit(x_train, y_train) 
+            clf.fit(x_train, y_train)
+            print clf.predict(x_train)
             s += clf.score(x_test, y_test)
             s_g += clf.score(x_test, y_test)
             #print('Variance score: %.2f' % clf.score(x_test, y_test))
