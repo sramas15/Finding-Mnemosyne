@@ -38,6 +38,9 @@ INTERVAL_BUCKETS = [
 
 import bisect
 
+def get_interval(bucket):
+    return INTERVAL_BUCKETS[bucket]
+
 def get_interval_bucket(interval):
     return bisect.bisect_right(INTERVAL_BUCKETS, interval)
 

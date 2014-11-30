@@ -1,7 +1,7 @@
 from django.utils import timezone
 
 from cards.models import Card, CardSet, AssignedCard
-from models import RegressionWeights, RepIntervalLog
+from models import RegressionWeights, RepIntervalLog, get_interval
 
 from datetime import timedelta
 
@@ -57,24 +57,62 @@ def update_card(assigned_card, new_grade, new_rep_time):
 
     assigned_card.save()
 
+def easiness_update(easiness, grade):
+    return easiness - 0.8 + 0.28 * grade - 0.02 * (grade * grade)
+
+
+from sklearn import svm
+import numpy as np
+import sys
+
 def schedule_rep(assigned_card, target_grade=4):
     "Schedule the next repetition for the assigned card."
 
-    """
-    weights = RegressionWeights.objects.get(user=assigned_card.user)
+    # weights = RegressionWeights.objects.get(user=assigned_card.user)
+    # new_interval = weights.intercept + \
+    #         weights.grade * assigned_card.last_grade + \
+    #         weights.easiness * assigned_card.easiness + \
+    #         weights.ret_reps * assigned_card.ret_reps + \
+    #         weights.ret_reps_since_lapse * assigned_card.ret_reps_since_lapse + \
+    #         weights.lapses * assigned_card.lapses + \
+    #         weights.new_grade * target_grade
+    # new_interval = timedelta(days=1).total_seconds()
 
-    new_interval = weights.intercept + \
-            weights.grade * assigned_card.last_grade + \
-            weights.easiness * assigned_card.easiness + \
-            weights.ret_reps * assigned_card.ret_reps + \
-            weights.ret_reps_since_lapse * assigned_card.ret_reps_since_lapse + \
-            weights.lapses * assigned_card.lapses + \
-            weights.new_grade * target_grade
-            """
-    new_interval = timedelta(days=1).total_seconds()
+    svm_model = get_svm_model(assigned_card.user)
+    features = np.array([assigned_card.last_grade, target_grade, assigned_card.easiness,
+        assigned_card.ret_reps, assigned_card.ret_reps_since_lapse, assigned_card.lapses])
+    new_interval_bucket = svm_model.predict(features)[0]
+    new_interval = get_interval(new_interval_bucket)
+
+    print >>sys.stderr, new_interval_bucket, new_interval
 
     return assigned_card.last_shown + timedelta(seconds=new_interval)
 
-def easiness_update(easiness, grade):
-    return easiness - 0.8 + 0.28 * grade - 0.02 * (grade * grade)
+_user_to_svm = {}
+def get_svm_model(user, window_size=150):
+    if user in _user_to_svm:
+        # TODO check whether it's time to retrain the model
+        return _user_to_svm[user]
+
+    # FIXME the logs may not actually be in chronological order...
+
+    logs = RepIntervalLog.objects.filter(user=user)
+    start_i = max(0, len(logs) - window_size)
+    logs = logs[start_i:]
+
+    x_train = np.array([(log.grade, log.new_grade, log.easiness,
+        log.ret_reps, log.ret_reps_since_lapse, log.lapses) for log in logs])
+    y_train = np.array([log.interval_bucket for log in logs])
+
+    svm_model = svm.SVC()
+    svm_model.fit(x_train, y_train)
+
+    # begin debug code
+    print >>sys.stderr, "Training score: %s" % svm_model.score(x_train, y_train)
+    # print >>sys.stderr, svm_model.predict(x_train)
+    # end debug code
+
+    _user_to_svm[user] = svm_model
+
+    return svm_model
 
