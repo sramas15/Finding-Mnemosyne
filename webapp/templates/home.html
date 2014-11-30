@@ -2,12 +2,36 @@
 
 {% block content %}
 
-Card sets uploaded:
+Card sets available:
 <ul>
-{% for card_set in card_sets %}
-<li>{{ card_set.name }}</li>
-{% endfor %}
+    {% for card_set in card_sets %}
+    <li>
+        {{ card_set.name }}
+        {% if not card_set.added %}
+        <button class="btn btn-link add-card-set-button" data-card-set-id="{{ card_set.id }}">(add to my deck)</button>
+        {% endif %}
+    </li>
+    {% endfor %}
 </ul>
+
+You currently have {{ num_cards }} cards in your study deck.
 
 {% endblock %}
 
+{% block jsIncludes %}
+<script type="text/javascript">
+
+(function ($) {
+ $(".add-card-set-button").each(function () {
+    var cardSetId = $(this).data("card-set-id");
+    $(this).click(function() {
+        $.getJSON("/json/add_card_set/" + cardSetId, function () {
+            location.reload();
+        });
+    });
+});
+
+})(jQuery);
+
+</script>
+{% endblock %}

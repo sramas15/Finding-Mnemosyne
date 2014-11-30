@@ -1,25 +1,6 @@
 (function ($) {
     "use strict";
 
-    // load cards
-
-    // study cards
-    //
-
-    var i = 0;
-    function nextCard() {
-        console.log(i);
-        console.log($.cards[i]);
-        showCard($.cards[i], function () {
-            i++;
-            nextCard();
-        });
-    }
-
-    nextCard();
-
-
-
     /* Displays the given card, and passes the resulting grade to the callback. */
     function showCard(card, callback) {
         $("#question-content").html(card.question.replace(/\n/g, "<br/>"));
@@ -41,7 +22,18 @@
         });
     }
 
-    // send requests to update database as we go
 
+    function nextCard(cards, i) {
+        showCard(cards[i], function (grade) {
+            // send requests to update database as we go
+            $.post("/json/new_log");
+            // FIXME
+            nextCard(cards, i + 1);
+        });
+    }
+
+    $.getJSON("/json/get_study_queue", function (cards) {
+        nextCard(cards, 0);
+    });
 
 })(jQuery);

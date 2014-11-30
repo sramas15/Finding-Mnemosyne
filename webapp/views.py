@@ -7,16 +7,26 @@ from django.forms.models import model_to_dict
 
 from webapp.forms import UploadCardSetForm
 from cards.file_formats import Mnemosyne2Cards
-from cards.models import Card, CardSet
+from cards.models import Card, CardSet, AssignedCard
 
 import sys
 import json
 
 @login_required
 def home(request):
-    return render_to_response('home.html',
-            {'card_sets': CardSet.objects.all()},
-            context_instance=RequestContext(request))
+    # The user's cards
+    user_cards = AssignedCard.objects.filter(user=request.user)
+
+    card_set_info = [{
+            'name': card_set.name,
+            'id': card_set.id,
+            'added': bool(AssignedCard.objects.filter(user=request.user, card__card_set=card_set))
+        } for card_set in CardSet.objects.all()]
+
+    return render_to_response('home.html', {
+            'card_sets': card_set_info,
+            'num_cards': len(user_cards)
+        }, context_instance=RequestContext(request))
 
 @login_required
 def study(request):

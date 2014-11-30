@@ -6,6 +6,8 @@ urlpatterns = patterns('',
     # url(r'^$', 'webapp.views.home', name='home'),
     # url(r'^blog/', include('blog.urls')),
 
+    url(r'^json/get_study_queue/$', 'cards.views.get_study_queue', name='get_study_queue'),
+    url(r'^json/add_card_set/(?P<card_set_id>\d+)/$', 'cards.views.add_card_set', name='add_card_set'),
     url(r'^$', 'webapp.views.home', name='home'),
     url(r'^study/$', 'webapp.views.study', name='study'),
     url(r'^upload/$', 'webapp.views.upload_card_set', name='upload_card_set'),
