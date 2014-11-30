@@ -3,8 +3,8 @@ import zipfile
 
 class Mnemosyne2Cards(object):
     @staticmethod
-    def read(filename):
-        with zipfile.ZipFile(filename, "r") as zip_file:
+    def read(raw_file):
+        with zipfile.ZipFile(raw_file, "r") as zip_file:
             # Extract cards XML file
             cards_file = zip_file.open("cards.xml")
 

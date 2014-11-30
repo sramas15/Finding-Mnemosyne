@@ -110,7 +110,7 @@ def create_discretizeddb():
     c.execute('''CREATE TABLE discrete_log
         (user_id text, object_id test, grade integer, easiness real, ret_reps integer,
          ret_reps_since_lapse integer, lapses integer, pred_grade integer,
-         interval integer)''')
+         interval integer, interval_bucket integer)''')
     c.execute('SELECT * from regression_log')
     row = None
     rows = []
@@ -119,8 +119,8 @@ def create_discretizeddb():
         if row == None:
             break
         interval = get_interval(row[8])
-        rows.append([row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], interval])
-    c.executemany("INSERT INTO discrete_log VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", rows)
+        rows.append([row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], interval])
+    c.executemany("INSERT INTO discrete_log VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", rows)
     new_conn.commit()
 
 import bisect

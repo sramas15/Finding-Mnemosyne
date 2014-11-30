@@ -4,7 +4,6 @@ from cards.models import Card, CardSet, AssignedCard
 from models import RegressionWeights, RepIntervalLog
 
 from datetime import timedelta
-import bisect
 
 def log_rep(assigned_card, new_grade, now):
     "Log a repetition. Make sure to call this before updating the assigned card."

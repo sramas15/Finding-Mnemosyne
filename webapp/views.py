@@ -5,7 +5,7 @@ from django.template.loader import get_template
 from django.template import Context, RequestContext
 from django.forms.models import model_to_dict
 
-from webapp.forms import UploadCardSetForm
+from webapp.forms import UploadCardSetForm, UploadUserLogsForm
 from cards.file_formats import Mnemosyne2Cards
 from cards.models import Card, CardSet, AssignedCard
 from scheduling.models import RepIntervalLog
@@ -64,29 +64,34 @@ def upload_card_set(request):
             context_instance=RequestContext(request))
 
 
+import csv
+
 @login_required
 def upload_user_logs(request):
     if request.method == 'POST':
-        form = UploadCardSetForm(request.POST, request.FILES)
+        form = UploadUserLogsForm(request.POST, request.FILES)
         if form.is_valid():
+
             # Read cards file
+            rows = csv.reader(request.FILES['file'])
+            for row in rows:
+                log = RepIntervalLog(
+                        user=request.user,
+                        card=None,
+                        grade=row[2],
+                        easiness=row[3],
+                        ret_reps=row[4],
+                        ret_reps_since_lapse=row[5],
+                        lapses=row[6],
+                        new_grade=row[7],
+                        interval=row[8],
+                        interval_bucket=row[9]
+                        )
+                log.save()
 
-
-            #print >>sys.stderr, cards
-            if cards:
-                # Create new card set
-                card_set = CardSet(name=form.cleaned_data['name'])
-                card_set.save()
-
-                # Create cards
-                for question, answer in cards:
-                    card = Card(card_set=card_set, question=question, answer=answer)
-                    card.save()
-
-        # TODO: provide feedback for invalid uploads
     else:
-        form = UploadCardSetForm()
-    return render_to_response('upload.html',
+        form = UploadUserLogsForm()
+    return render_to_response('upload_user_logs.html',
             {'form': form},
             context_instance=RequestContext(request))
 
