@@ -39,9 +39,6 @@ def get_scheduled_cards(user):
 def update_card(assigned_card, new_grade, new_rep_time):
     "Update card"
     if assigned_card.last_grade > 1:
-        # If grade was [2, 3, 4, 5], increment retention phase reps count.
-        assigned_card.ret_reps += 1
-
         if new_grade <= 1:
             # User just "lapsed", transition from retention -> acquisition phase
             assigned_card.lapses += 1
@@ -49,16 +46,31 @@ def update_card(assigned_card, new_grade, new_rep_time):
         else:
             # User is staying in retention phase
             assigned_card.ret_reps_since_lapse += 1
+            # If grade was [2, 3, 4, 5], increment retention phase reps count.
+            assigned_card.ret_reps += 1
 
-    assigned_card.easiness = easiness_update(assigned_card.easiness, new_grade)
+    ontime = (assigned_card.scheduled_rep <= new_rep_time)
+    assigned_card.easiness = easiness_update(assigned_card.easiness, new_grade, ontime)
     assigned_card.last_shown = new_rep_time
     assigned_card.last_grade = new_grade
     assigned_card.scheduled_rep = schedule_rep(assigned_card)
 
     assigned_card.save()
 
-def easiness_update(easiness, grade):
-    return easiness - 0.8 + 0.28 * grade - 0.02 * (grade * grade)
+def easiness_update(easiness, grade, ontime):
+    # Don't update easiness when learning ahead. Easiness calculation consistent
+    # with how Mnemosyne does the calculation (so the regression weights will be accurate)
+    if ontime:
+        if grade == 2:
+            easiness -= 0.16
+        if grade == 3:
+            easiness -= 0.14
+        if grade == 5:
+            easiness += 0.10
+        if easiness < 1.3:
+            easiness = 1.3
+    return easiness
+    # return easiness - 0.8 + 0.28 * grade - 0.02 * (grade * grade)
 
 
 from sklearn import svm
