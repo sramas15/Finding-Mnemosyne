@@ -32,11 +32,16 @@ I'm not sure what the details are on this, but mainly you'll just need to have a
 running locally on your machine, and also to have the command line util "psql" to play around in case
 you want to see the tables.
 
+You may also have to set the environmental variable to tell Django to look on localhost
+for a Postgres database:
+
+    export DATABASE_URL=postgres:///$(whoami)
+
 After installing postgres, create the tables:
 
     python manage.py migrate
 
-Also create your superuser (gives you access to admin panel at /admin)
+Also create your superuser (gives you access to admin panel at /admin):
 
     python manage.py createsuperuser
 
@@ -106,3 +111,22 @@ To double check the rows are there now, query the postgres tables:
     psql
     <sheila>=# select * from scheduling_repintervallog;
 
+
+Changing the database
+=====================
+Look in the Django documentation for how to use "makemigrations" and "migrate".
+
+If someone else has updated the models and created the migrations already, just try running:
+
+    python manage.py migrate
+
+in order to upgrade your database tables.
+
+
+Debugging
+=========
+When you are running the development server with foreman, print statements are normally suppressed.
+You can force them to appear in your console by printing to stderr:
+
+    # in the python file
+    print >>sys.stderr, "Hello World"

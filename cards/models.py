@@ -15,6 +15,7 @@ class AssignedCard(models.Model):
     last_shown = models.DateTimeField(null=True)
     last_grade = models.SmallIntegerField(default=0)
     easiness = models.FloatField(default=2.5)
+    acq_reps = models.IntegerField(default=0)
     ret_reps = models.IntegerField(default=0)
     ret_reps_since_lapse = models.IntegerField(default=0)
     lapses = models.IntegerField(default=0)

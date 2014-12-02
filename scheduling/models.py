@@ -8,6 +8,7 @@ class RepIntervalLog(models.Model):
     grade = models.SmallIntegerField()
     new_grade = models.SmallIntegerField()
     easiness = models.FloatField()
+    acq_reps = models.IntegerField()
     ret_reps = models.IntegerField()
     ret_reps_since_lapse = models.IntegerField()
     lapses = models.IntegerField()

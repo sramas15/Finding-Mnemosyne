@@ -80,12 +80,13 @@ def upload_user_logs(request):
                         card=None,
                         grade=row[2],
                         easiness=row[3],
-                        ret_reps=row[4],
-                        ret_reps_since_lapse=row[5],
-                        lapses=row[6],
-                        new_grade=row[7],
-                        interval=row[8],
-                        interval_bucket=row[9]
+                        acq_reps=row[4],
+                        ret_reps=row[5],
+                        ret_reps_since_lapse=row[6],
+                        lapses=row[7],
+                        new_grade=row[8],
+                        interval=row[9],
+                        interval_bucket=row[10]
                         )
                 log.save()
 

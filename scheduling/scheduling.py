@@ -20,6 +20,7 @@ def log_rep(assigned_card, new_grade, now):
             grade=assigned_card.last_grade,
             new_grade=new_grade,
             easiness=assigned_card.easiness,
+            acq_reps=assigned_card.acq_reps,
             ret_reps=assigned_card.ret_reps,
             ret_reps_since_lapse=assigned_card.ret_reps_since_lapse,
             lapses=assigned_card.lapses,
@@ -41,7 +42,12 @@ def get_scheduled_cards(user):
 
 def update_card(assigned_card, new_grade, new_rep_time):
     "Update card"
-    if assigned_card.last_grade > 1:
+    if assigned_card.last_grade <= 1:
+        # User was in acquisition phase
+        assigned_card.acq_reps += 1
+    else:
+        # User was in retention phase
+        assigned_card.ret_reps += 1
         if new_grade <= 1:
             # User just "lapsed", transition from retention -> acquisition phase
             assigned_card.lapses += 1
@@ -49,8 +55,7 @@ def update_card(assigned_card, new_grade, new_rep_time):
         else:
             # User is staying in retention phase
             assigned_card.ret_reps_since_lapse += 1
-            # If grade was [2, 3, 4, 5], increment retention phase reps count.
-            assigned_card.ret_reps += 1
+
 
     ontime = (assigned_card.scheduled_rep <= new_rep_time)
     assigned_card.easiness = easiness_update(assigned_card.easiness, new_grade, ontime)
@@ -93,6 +98,7 @@ def schedule_rep(assigned_card, target_grade=4):
     #         weights.new_grade * target_grade
     # new_interval = timedelta(days=1).total_seconds()
 
+    # TODO: add acq_reps as a feature?
     svm_model = get_svm_model(assigned_card.user)
     features = np.array([assigned_card.last_grade, target_grade, assigned_card.easiness,
         assigned_card.ret_reps, assigned_card.ret_reps_since_lapse, assigned_card.lapses])
