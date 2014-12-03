@@ -93,16 +93,12 @@ log entries into the database as your user's own logs (I haven't done any fancy 
 special/separate user to associate these "prior" entries with yet).
 
 Create the CSV file. Make sure filtered_logs.db is created already, and that discrete_log has been
-rebuilt using the new code.
+rebuilt using the new code. Just run this script for the USER_ID you want:
 
-    sqlite3 scripts/data/filtered_logs.db
-    sqlite> .mode csv
-    sqlite> .output logs.csv
-    sqlite> select * from discrete_log where user_id="<THE_CHOSEN_ONE>";
-    sqlite> .exit
+    cd scripts # if you haven't already
+    ./get_user_data.sh USER_ID > PATH/TO/OUTPUT_FILE.csv
 
-You should now have a file at "logs.csv" with the rows you selected. You can upload this file at:
-localhost:5000/upload_user_logs
+You can upload this output file at: localhost:5000/upload_user_logs
 It should have the same (stupid) form behavior as the card upload form (it will look like nothing has
 happened if you succeeded.)
 

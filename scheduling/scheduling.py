@@ -25,7 +25,7 @@ def log_rep(assigned_card, new_grade, now):
             ret_reps_since_lapse=assigned_card.ret_reps_since_lapse,
             lapses=assigned_card.lapses,
             interval=interval,
-            interval=get_interval_bucket(interval))
+            interval_bucket=get_interval_bucket(interval))
 
 def add_unseen_cards(user, limit=20):
     "Schedule (at most 'limit') unseen cards to be studied now"
