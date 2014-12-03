@@ -5,6 +5,7 @@ from cards.models import Card
 class RepIntervalLog(models.Model):
     user = models.ForeignKey(User)
     card = models.ForeignKey(Card, null=True)
+    timestamp = models.DateTimeField()
     grade = models.SmallIntegerField()
     new_grade = models.SmallIntegerField()
     easiness = models.FloatField()

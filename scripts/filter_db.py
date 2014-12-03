@@ -82,6 +82,7 @@ def create_regressiondb():
         if (prev_row[USER_ID] == row[USER_ID] and prev_row[OBJECT_ID] == row[OBJECT_ID]):
             rows.append([row[USER_ID],
                 row[OBJECT_ID],
+                row[TIMESTAMP],
                 prev_row[GRADE],
                 prev_row[EASINESS],
                 prev_row[ACQ_REPS],
@@ -93,10 +94,10 @@ def create_regressiondb():
         prev_row = row
     c.execute("DROP TABLE IF EXISTS regression_log")
     c.execute('''CREATE TABLE regression_log
-        (user_id text, object_id test, grade integer, easiness real, acq_reps integer, ret_reps integer,
+        (user_id text, object_id test, timestamp integer, grade integer, easiness real, acq_reps integer, ret_reps integer,
          ret_reps_since_lapse integer, lapses integer, pred_grade integer,
          interval integer)''')
-    c.executemany("INSERT INTO regression_log VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", rows)
+    c.executemany("INSERT INTO regression_log VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", rows)
     new_conn.commit()
     print len(rows)
 
@@ -109,7 +110,7 @@ def create_discretizeddb():
     c.execute('SELECT * FROM log ORDER BY user_id, object_id, timestamp')
     c.execute("DROP TABLE IF EXISTS discrete_log")
     c.execute('''CREATE TABLE discrete_log
-        (user_id text, object_id test, grade integer, easiness real, acq_reps integer, ret_reps integer,
+        (user_id text, object_id test, timestamp integer, grade integer, easiness real, acq_reps integer, ret_reps integer,
          ret_reps_since_lapse integer, lapses integer, pred_grade integer,
          interval integer, interval_bucket integer)''')
     c.execute('SELECT * from regression_log')
@@ -119,9 +120,9 @@ def create_discretizeddb():
         row = c.fetchone()
         if row == None:
             break
-        interval = get_interval(row[8])
-        rows.append([row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], interval])
-    c.executemany("INSERT INTO discrete_log VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", rows)
+        interval = get_interval(row[10])
+        rows.append([row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], interval])
+    c.executemany("INSERT INTO discrete_log VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", rows)
     new_conn.commit()
 
 import bisect

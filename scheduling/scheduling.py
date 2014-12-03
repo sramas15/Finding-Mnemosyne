@@ -17,6 +17,7 @@ def log_rep(assigned_card, new_grade, now):
     log = RepIntervalLog(
             user=assigned_card.user,
             card=assigned_card.card,
+            timestamp=now,
             grade=assigned_card.last_grade,
             new_grade=new_grade,
             easiness=assigned_card.easiness,

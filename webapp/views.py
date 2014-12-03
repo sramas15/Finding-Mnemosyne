@@ -12,6 +12,7 @@ from scheduling.models import RepIntervalLog
 
 import sys
 import json
+import datetime
 
 @login_required
 def home(request):
@@ -78,15 +79,16 @@ def upload_user_logs(request):
                 log = RepIntervalLog(
                         user=request.user,
                         card=None,
-                        grade=row[2],
-                        easiness=row[3],
-                        acq_reps=row[4],
-                        ret_reps=row[5],
-                        ret_reps_since_lapse=row[6],
-                        lapses=row[7],
-                        new_grade=row[8],
-                        interval=row[9],
-                        interval_bucket=row[10]
+                        timestamp=datetime.datetime.fromtimestamp(float(row[2])),
+                        grade=row[3],
+                        easiness=row[4],
+                        acq_reps=row[5],
+                        ret_reps=row[6],
+                        ret_reps_since_lapse=row[7],
+                        lapses=row[8],
+                        new_grade=row[9],
+                        interval=row[10],
+                        interval_bucket=row[11]
                         )
                 log.save()
 
