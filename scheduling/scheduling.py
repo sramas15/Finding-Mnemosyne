@@ -100,7 +100,7 @@ def schedule_rep(assigned_card, target_grade=4):
     # new_interval = timedelta(days=1).total_seconds()
 
     # TODO: add acq_reps as a feature?
-    svm_model = get_svm_model(assigned_card.user)
+    svm_model = get_svm_model(assigned_card.user, assigned_card.last_grade)
     features = np.array([assigned_card.last_grade, target_grade, assigned_card.easiness,
         assigned_card.ret_reps, assigned_card.ret_reps_since_lapse, assigned_card.lapses])
     new_interval_bucket = svm_model.predict(features)[0]
@@ -111,19 +111,25 @@ def schedule_rep(assigned_card, target_grade=4):
     return assigned_card.last_shown + timedelta(seconds=new_interval)
 
 _user_to_svm = {}
-def get_svm_model(user, window_size=150):
+_user_to_svm_time = {}
+_CACHE_LIMIT = timedelta(hours=12)
+def get_svm_model(user, grade, window_size=150):
     if user in _user_to_svm:
         # TODO check whether it's time to retrain the model
-        return _user_to_svm[user]
+        if grade in _user_to_svm and timezone.now() < _user_to_svm_time[user][grade] + _CACHE_LIMIT:
+            return _user_to_svm[user][grade]
+    else:
+        _user_to_svm[user] = {}
+        _user_to_svm_time[user] = {}
 
     # FIXME the logs may not actually be in chronological order...
 
-    logs = RepIntervalLog.objects.filter(user=user)
+    logs = RepIntervalLog.objects.filter(user=user,grade=grade)
     start_i = max(0, len(logs) - window_size)
     logs = logs[start_i:]
 
-    x_train = np.array([(log.grade, log.new_grade, log.easiness,
-        log.ret_reps, log.ret_reps_since_lapse, log.lapses) for log in logs])
+    x_train = np.array([(log.new_grade, log.easiness,
+        log.ret_reps, log.ret_reps_since_lapse, log.lapses, log.acq_reps) for log in logs])
     y_train = np.array([log.interval_bucket for log in logs])
 
     svm_model = svm.SVC()
@@ -134,7 +140,8 @@ def get_svm_model(user, window_size=150):
     # print >>sys.stderr, svm_model.predict(x_train)
     # end debug code
 
-    _user_to_svm[user] = svm_model
+    _user_to_svm[user][grade] = svm_model
+    _user_to_svm_time[user][grade] = timezone.now()
 
     return svm_model
 
