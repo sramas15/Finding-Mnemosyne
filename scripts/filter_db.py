@@ -120,8 +120,8 @@ def create_discretizeddb():
         row = c.fetchone()
         if row == None:
             break
-        interval = get_interval(row[10])
-        rows.append([row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], interval])
+        interval_bucket = get_interval_bucket(row[10])
+        rows.append([row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], interval_bucket])
     c.executemany("INSERT INTO discrete_log VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", rows)
     new_conn.commit()
 
@@ -137,7 +137,7 @@ INTERVAL_BUCKETS = [
         60*60*24*16,
         60*60*24*64
     ]
-def get_interval(interval):
+def get_interval_bucket(interval):
     return bisect.bisect_right(INTERVAL_BUCKETS, interval)
 
 if __name__ == '__main__':
